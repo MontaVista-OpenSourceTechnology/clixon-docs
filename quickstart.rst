@@ -12,11 +12,12 @@ This section describes how to run the *hello world* example available in source 
 Clixon is not a system in itself, it is a support system for an
 application. In this case, the "application" is hello world. The hello
 world application is very simple where the application semantics is
-completely described by a YANG and CLI specification.
+completely described by a YANG and CLI specification.  It has a small
+backend that modified a file to hold state.
 
-A more advanced application have backend and frontend plugins
-that define application-specific semantics. No plugins are present in the
-hello world application.
+A more advanced application have a sophisticated backend and frontend
+plugins that define application-specific semantics. Only a simple
+backend is present in the hello world application.
 
 The hello world example can be run both natively on the host and in a docker container.
 
@@ -70,12 +71,12 @@ Compile and install::
 Start backend in the background:
 ::
 
-    sudo clixon_backend
+    sudo clixon_backend -f /usr/local/etc/clixon/hello.xml -s startup
 
 Start cli:
 ::
 
-    clixon_cli
+    clixon_cli -f /usr/local/etc/clixon/hello.xml
 
 Using the CLI
 =============
@@ -88,14 +89,16 @@ The following example shows how to add a very simple configuration `hello world`
    olof@vandal> clixon_cli
    cli> set <?>
      hello
-   cli> set hello world
+   cli> set hello to world
    cli> show configuration
-   hello world;
+   clixon-hello:hello {
+   to world;
+   }
    cli> commit
    cli> delete <?>
      all                   Delete whole candidate configuration
      hello
-   cli> delete hello 
+   cli> delete hello
    cli> show configuration 
    cli> commit 
    cli> quit
@@ -126,9 +129,12 @@ As an alternative, you can use the `FCGI` solution, where instead a reverse prox
   
 Start and run
 -------------
-Regardless of which RESTCONF variant is used, start the restconf daemon as follows::
+The hello world xml file specifies that restconf should be started
+automatically, so there should be no need to start it.  If you need to
+start it yourself, regardless of which RESTCONF variant is used, start
+the restconf daemon as follows::
 
-   sudo clixon_restconf
+   sudo clixon_restconf -f /usr/local/etc/clixon/hello.xml
 
 Start sending restconf commands (using Curl).  First, add an entry:
 ::
@@ -204,9 +210,9 @@ Or using restconf using curl on exposed port 8080:
    
 Next steps
 ==========
-The hello world example only has a Yang spec and a template CLI
-spec. For more advanced applications, customized backend, CLI, netconf
-and restconf code callbacks becomes necessary.
+The hello world example only has a Yang spec, a template CLI spec, and
+a simple backend. For more advanced applications, customized backend,
+CLI, netconf and restconf code callbacks becomes necessary.
 
 Further, you may want to add upgrade, RPC:s, state data, notification
 streams, authentication and authorization. The `main example <https://github.com/clicon/clixon/tree/master/example/main>`_ contains such capabilities.
