@@ -130,19 +130,44 @@ Regardless of which RESTCONF variant is used, start the restconf daemon as follo
 
    sudo clixon_restconf
 
-Start sending restconf commands (using Curl):
+Start sending restconf commands (using Curl).  First, add an entry:
 ::
 
-   olof@vandal> curl -X POST http://localhost/restconf/data -d '{"clixon-hello:hello":{"world":null}}'
-   olof@vandal> curl -X GET http://localhost/restconf/data 
-   {
-      "data": {
-        "clixon-hello:hello": {
-          "world": null
-        }
-      }
-   }
+   $ curl -X POST http://localhost/restconf/data \
+        -H "Content-Type: application/yang-data+json" \
+        -d '{"clixon-hello:hello":{"to":"world"}}'
 
+Now get the value:
+::
+
+   $ curl -X GET http://localhost/restconf/data/clixon-hello:hello
+   {"clixon-hello:hello":{"to":"world"}}
+
+This fetches the data from the configuration and from the the state
+and merges it together.  To get the data just from the configuration
+database, do:
+::
+
+   $ curl -X GET http://localhost/restconf/data/clixon-hello:hello?content=config
+   {"clixon-hello:hello":{"to":"world"}}
+
+To get the data from the state, do:
+::
+
+   $ curl -X GET http://localhost/restconf/data/clixon-hello:hello?content=nonconfig
+   {"clixon-hello:hello":{"to":"world"}}
+
+To change the value, do:
+::
+
+   $ curl -X PUT http://localhost/restconf/data/clixon-hello:hello/to \
+       -H "Content-Type: application/yang-data+json"
+       -d '{"clixon-hello:to":"country"}'
+
+And to delete the value:
+::
+
+   $ curl -X DELETE http://localhost/restconf/data/clixon-hello:hello
 
 Docker container
 ================
